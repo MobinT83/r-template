@@ -26,12 +26,19 @@ export type TCharacter = {
   updateAt: string;
 };
 
-export const getCharacters = async (): Promise<{
+export const getCharacters = async (params?: {
+  search?: string;
+  limit?: number;
+  skip?: number;
+}): Promise<{
   limit: number;
   skip: number;
   total: number;
   products: TCharacter[];
 }> => {
-  const response = await api.get("/products");
+  const { search = "", limit = 0, skip = 0 } = params || {};
+  const response = await api.get("/products" + (search ? "/search" : ""), {
+    params: search ? { q: search, limit, skip } : { limit, skip },
+  });
   return response.data;
 };
