@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { getCharacters, type TCharacter } from "./lib/api";
-import Card from "./components/card";
 import {
   Select,
   SelectContent,
@@ -9,6 +8,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 
 const App = () => {
   const [characters, setCharacters] = useState<TCharacter[]>([]);
@@ -71,7 +71,16 @@ const App = () => {
       </div>
       <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
         {characters.map((character) => (
-          <Card key={character.id} character={character} />
+          <Card key={character.id}>
+            <CardContent className="py-4">
+              <p className="text-gray-700 text-base min-h-[48px]">
+                {character.description}
+              </p>
+            </CardContent>
+            <CardFooter className="border-t pt-4 flex justify-between items-center">
+              <span className="text-xs text-gray-400">ID: {character.id}</span>
+            </CardFooter>
+          </Card>
         ))}
       </div>
     </div>
