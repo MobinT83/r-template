@@ -9,17 +9,24 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const App = () => {
   const [characters, setCharacters] = useState<TCharacter[]>([]);
   const [search, setSearch] = useState("");
   const [limit, setLimit] = useState(10);
   const [skip, setSkip] = useState(0);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchCharacters = async () => {
-      const response = await getCharacters({ search, limit, skip });
-      setCharacters(response.products);
+      setLoading(true);
+      try {
+        const response = await getCharacters({ search, limit, skip });
+        setCharacters(response.products);
+      } finally {
+        setLoading(false);
+      }
     };
     fetchCharacters();
   }, [search, limit, skip]);
@@ -70,18 +77,33 @@ const App = () => {
         </Select>
       </div>
       <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
-        {characters.map((character) => (
-          <Card key={character.id}>
-            <CardContent className="py-4">
-              <p className="text-gray-700 text-base min-h-[48px]">
-                {character.description}
-              </p>
-            </CardContent>
-            <CardFooter className="border-t pt-4 flex justify-between items-center">
-              <span className="text-xs text-gray-400">ID: {character.id}</span>
-            </CardFooter>
-          </Card>
-        ))}
+        {loading
+          ? Array.from({ length: limit }).map((_, i) => (
+              <Card key={i}>
+                <CardContent className="py-4">
+                  <Skeleton className="h-6 w-2/3 mb-2 rounded" />
+                  <Skeleton className="h-4 w-1/2 rounded" />
+                  <Skeleton className="h-4 w-full mt-2 rounded" />
+                </CardContent>
+                <CardFooter className="border-t pt-4 flex justify-between items-center">
+                  <Skeleton className="h-4 w-16 rounded" />
+                </CardFooter>
+              </Card>
+            ))
+          : characters.map((character) => (
+              <Card key={character.id}>
+                <CardContent className="py-4">
+                  <p className="text-gray-700 text-base min-h-[48px]">
+                    {character.description}
+                  </p>
+                </CardContent>
+                <CardFooter className="border-t pt-4 flex justify-between items-center">
+                  <span className="text-xs text-gray-400">
+                    ID: {character.id}
+                  </span>
+                </CardFooter>
+              </Card>
+            ))}
       </div>
     </div>
   );
