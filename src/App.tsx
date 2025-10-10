@@ -1,5 +1,13 @@
 import { useEffect, useState } from "react";
 import { getCharacters, type TCharacter } from "./lib/api";
+import Card from "./components/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const App = () => {
   const [characters, setCharacters] = useState<TCharacter[]>([]);
@@ -30,7 +38,7 @@ const App = () => {
           onChange={(e) => setSearch(e.target.value)}
           className="w-full md:w-1/2 px-4 py-2 border rounded-lg shadow focus:outline-none focus:ring-2 focus:ring-blue-300"
         />
-        <select
+        {/* <select
           value={limit}
           onChange={(e) => setLimit(Number(e.target.value))}
           className="px-3 py-2 border rounded-lg shadow focus:outline-none"
@@ -38,34 +46,41 @@ const App = () => {
           {Array.from({ length: 20 }, (_, i) => (i + 1) * 5).map((opt) => (
             <option key={opt} value={opt}>{`Limit: ${opt}`}</option>
           ))}
-        </select>
-        <select
-          value={skip}
-          onChange={(e) => setSkip(Number(e.target.value))}
-          className="px-3 py-2 border rounded-lg shadow focus:outline-none"
+          </select> */}
+        <Select
+          onValueChange={(value) => setLimit(Number(value))}
+          value={String(limit)}
         >
-          {Array.from({ length: 11 }, (_, i) => i * 10).map((opt) => (
-            <option key={opt} value={opt}>{`Skip: ${opt}`}</option>
-          ))}
-        </select>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Limit" />
+          </SelectTrigger>
+          <SelectContent>
+            {Array.from({ length: 20 }, (_, i) => (i + 1) * 5).map((opt) => (
+              <SelectItem key={opt} value={String(opt)}>
+                {`Limit: ${opt}`}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select
+          onValueChange={(value) => setSkip(Number(value))}
+          value={String(skip)}
+        >
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Skip" />
+          </SelectTrigger>
+          <SelectContent>
+            {Array.from({ length: 11 }, (_, i) => i * 10).map((opt) => (
+              <SelectItem key={opt} value={String(opt)}>
+                {`Skip: ${opt}`}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
       <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
         {characters.map((character) => (
-          <div
-            className="relative border-0 bg-white rounded-3xl shadow-xl hover:shadow-2xl transition-shadow duration-300 p-8 flex flex-col gap-4 overflow-hidden group"
-            key={character.id}
-          >
-            <h2 className="text-2xl font-bold text-indigo-700 mb-2 group-hover:text-blue-500 transition-colors duration-200">
-              {character.title}
-            </h2>
-            <p className="text-gray-600 text-lg leading-relaxed mb-2 line-clamp-4">
-              {character.description}
-            </p>
-            <div className="flex items-center gap-2 mt-auto">
-              <span className="inline-block w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span>
-              <span className="text-xs text-gray-400">ID: {character.id}</span>
-            </div>
-          </div>
+          <Card key={character.id} character={character} />
         ))}
       </div>
     </div>
