@@ -18,6 +18,38 @@ const App = () => {
   const [skip, setSkip] = useState(0);
   const [loading, setLoading] = useState(false);
 
+  // Read initial values from URL on first render
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const q = params.get("search") ?? "";
+      const l = Number(params.get("limit") ?? "10");
+      const s = Number(params.get("skip") ?? "0");
+
+      if (q !== search) setSearch(q);
+      if (!Number.isNaN(l) && l !== limit) setLimit(l);
+      if (!Number.isNaN(s) && s !== skip) setSkip(s);
+    } catch (e) {
+      // ignore
+    }
+    // only run once on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const updateQuery = (opts: {
+    search?: string;
+    limit?: number;
+    skip?: number;
+  }) => {
+    const params = new URLSearchParams(window.location.search);
+    if (typeof opts.search !== "undefined") params.set("search", opts.search);
+    if (typeof opts.limit !== "undefined")
+      params.set("limit", String(opts.limit));
+    if (typeof opts.skip !== "undefined") params.set("skip", String(opts.skip));
+    const newUrl = `${window.location.pathname}?${params.toString()}`;
+    window.history.replaceState({}, "", newUrl);
+  };
+
   useEffect(() => {
     const fetchCharacters = async () => {
       setLoading(true);
@@ -43,10 +75,18 @@ const App = () => {
           type="text"
           placeholder="searching..."
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => {
+            const v = e.target.value;
+            setSearch(v);
+            updateQuery({ search: v, limit, skip });
+          }}
         />
         <Select
-          onValueChange={(value) => setLimit(Number(value))}
+          onValueChange={(value) => {
+            const v = Number(value);
+            setLimit(v);
+            updateQuery({ search, limit: v, skip });
+          }}
           value={String(limit)}
         >
           <SelectTrigger className="w-[180px]">
@@ -61,7 +101,11 @@ const App = () => {
           </SelectContent>
         </Select>
         <Select
-          onValueChange={(value) => setSkip(Number(value))}
+          onValueChange={(value) => {
+            const v = Number(value);
+            setSkip(v);
+            updateQuery({ search, limit, skip: v });
+          }}
           value={String(skip)}
         >
           <SelectTrigger className="w-[180px]">
