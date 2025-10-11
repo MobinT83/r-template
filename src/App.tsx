@@ -18,7 +18,6 @@ const App = () => {
   const [skip, setSkip] = useState(0);
   const [loading, setLoading] = useState(false);
 
-  // Read initial values from URL on first render
   useEffect(() => {
     try {
       const params = new URLSearchParams(window.location.search);
@@ -29,11 +28,7 @@ const App = () => {
       if (q !== search) setSearch(q);
       if (!Number.isNaN(l) && l !== limit) setLimit(l);
       if (!Number.isNaN(s) && s !== skip) setSkip(s);
-    } catch (e) {
-      // ignore
-    }
-    // only run once on mount
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    } catch (e) {}
   }, []);
 
   const updateQuery = (opts: {
